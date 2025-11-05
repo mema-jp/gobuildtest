@@ -102,23 +102,23 @@ jobs:
           ## インストール方法
           
           お使いのシステムに適したバイナリファイルをダウンロードしてください:
-          - **Linux (x64)**: `${{ env.BINARY_NAME }}-${VERSION}-linux-amd64`
-          - **Linux (ARM64)**: `${{ env.BINARY_NAME }}-${VERSION}-linux-arm64`
+          - **Linux (x64)**: `${{ env.BINARY_NAME }}-${{ VERSION }}-linux-amd64`
+          - **Linux (ARM64)**: `${{ env.BINARY_NAME }}-${{ VERSION }}-linux-arm64`
           
           ### インストール手順
           ```bash
           # ファイルをダウンロード
-          wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/${{ env.BINARY_NAME }}-${VERSION}-linux-amd64
+          wget https://github.com/${{ github.repository }}/releases/download/${{ VERSION }}/${{ env.BINARY_NAME }}-${{ VERSION }}-linux-amd64
           
           # チェックサムを検証 (推奨)
-          wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/${{ env.BINARY_NAME }}-${VERSION}-linux-amd64.sha256
-          sha256sum -c ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64.sha256
+          wget https://github.com/${{ github.repository }}/releases/download/${{ VERSION }}/${{ env.BINARY_NAME }}-${{ VERSION }}-linux-amd64.sha256
+          sha256sum -c ${{ env.BINARY_NAME }}-${{ VERSION }}-linux-amd64.sha256
           
           # 実行権限を付与
-          chmod +x ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64
+          chmod +x ${{ env.BINARY_NAME }}-${{ VERSION }}-linux-amd64
           
           # システムパスに移動 (オプション)
-          sudo mv ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64 /usr/local/bin/${{ env.BINARY_NAME }}
+          sudo mv ${{ env.BINARY_NAME }}-${{ VERSION }}-linux-amd64 /usr/local/bin/${{ env.BINARY_NAME }}
           ```
           EOF
           
