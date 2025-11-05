@@ -98,7 +98,7 @@ jobs:
           fi
           
           # リリースノートを作成
-          cat > release-notes.md << 'EOF'
+          cat > release-notes.md << EOF
           ## インストール方法
           
           お使いのシステムに適したバイナリファイルをダウンロードしてください:
