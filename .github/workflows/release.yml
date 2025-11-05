@@ -86,44 +86,43 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 提取版本号
+          # バージョン番号を抽出
           VERSION=${GITHUB_REF#refs/tags/}
           echo "Creating release for ${VERSION}..."
           
-          # 判断是否为预发布版本
+          # プレリリース版かどうかを判定
           PRERELEASE=""
           if [[ "$VERSION" == *"alpha"* ]] || [[ "$VERSION" == *"beta"* ]] || [[ "$VERSION" == *"rc"* ]]; then
             PRERELEASE="--prerelease"
             echo "This is a pre-release version"
           fi
           
-          # 创建 release notes
+          # リリースノートを作成
           cat > release-notes.md << 'EOF'
-          ## 安装说明
+          ## インストール方法
           
-          下载适合你系统的二进制文件:
+          お使いのシステムに適したバイナリファイルをダウンロードしてください:
           - **Linux (x64)**: `${{ env.BINARY_NAME }}-${VERSION}-linux-amd64`
           - **Linux (ARM64)**: `${{ env.BINARY_NAME }}-${VERSION}-linux-arm64`
           
-          ### 安装方法
-          
+          ### インストール手順
           ```bash
-          # 下载文件
+          # ファイルをダウンロード
           wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/${{ env.BINARY_NAME }}-${VERSION}-linux-amd64
           
-          # 验证校验和 (推荐)
+          # チェックサムを検証 (推奨)
           wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/${{ env.BINARY_NAME }}-${VERSION}-linux-amd64.sha256
           sha256sum -c ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64.sha256
           
-          # 添加执行权限
+          # 実行権限を付与
           chmod +x ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64
           
-          # 移动到系统路径 (可选)
+          # システムパスに移動 (オプション)
           sudo mv ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64 /usr/local/bin/${{ env.BINARY_NAME }}
           ```
           EOF
           
-          # 创建 release
+          # リリースを作成
           gh release create "$VERSION" \
             ./artifacts/* \
             --title "Release ${VERSION}" \
