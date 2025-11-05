@@ -102,11 +102,11 @@ jobs:
           ## インストール方法
           
           お使いのシステムに適したバイナリファイルをダウンロードしてください:
-          - **Linux (x64)**: `${{ env.BINARY_NAME }}-${VERSION}-linux-amd64`
-          - **Linux (ARM64)**: `${{ env.BINARY_NAME }}-${VERSION}-linux-arm64`
+          - **Linux (x64)**: \`${{ env.BINARY_NAME }}-${VERSION}-linux-amd64\`
+          - **Linux (ARM64)**: \`${{ env.BINARY_NAME }}-${VERSION}-linux-arm64\`
           
           ### インストール手順
-          ```bash
+          \`\`\`bash
           # ファイルをダウンロード
           wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/${{ env.BINARY_NAME }}-${VERSION}-linux-amd64
           
@@ -119,7 +119,7 @@ jobs:
           
           # システムパスに移動 (オプション)
           sudo mv ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64 /usr/local/bin/${{ env.BINARY_NAME }}
-          ```
+          \`\`\`
           EOF
           
           # リリースを作成
