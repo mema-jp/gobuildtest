@@ -42,22 +42,29 @@ jobs:
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 0
         run: |
-          OUTPUT_NAME="${{ env.BINARY_NAME }}-${{ steps.version.outputs.VERSION }}-${{ matrix.goos }}-${{ matrix.goarch }}"
+          set -euo pipefail
+          mkdir -p artifacts
           
-          echo "Building ${OUTPUT_NAME}..."
-          go build -ldflags="-s -w -X 'main.Version=${{ steps.version.outputs.VERSION }}'" \
-            -o "${OUTPUT_NAME}" .
+          echo "Building all cmd/* for ${GOOS}/${GOARCH}..."
+          for d in cmd/* ; do
+            if [ -d "$d" ]; then
+              name=$(basename "$d")
+              OUTPUT_NAME="${name}-${{ steps.version.outputs.VERSION }}-${GOOS}-${GOARCH}"
+              echo "  - Building ${OUTPUT_NAME} from ${d}..."
+              GOOS="${GOOS}" GOARCH="${GOARCH}" CGO_ENABLED=0 \
+                go build -ldflags="-s -w -X 'main.Version=${{ steps.version.outputs.VERSION }}'" \
+                -o "artifacts/${OUTPUT_NAME}" "./${d}"
+              sha256sum "artifacts/${OUTPUT_NAME}" > "artifacts/${OUTPUT_NAME}.sha256"
+            fi
+          done
           
-          # 生成校验和
-          sha256sum "${OUTPUT_NAME}" > "${OUTPUT_NAME}.sha256"
-          
-          echo "✅ Build complete: ${OUTPUT_NAME}"
+          echo "✅ Build complete for ${GOOS}/${GOARCH}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: ${{ env.BINARY_NAME }}-${{ matrix.goos }}-${{ matrix.goarch }}
-          path: ${{ env.BINARY_NAME }}-*
+          path: artifacts/${{ env.BINARY_NAME }}-*
           retention-days: 1
 
   release:
@@ -97,28 +104,31 @@ jobs:
             echo "This is a pre-release version"
           fi
           
-          # リリースノートを作成
+          # リリースノートを作成（例：各 cmd のバイナリ名は <cmd>-${VERSION}-<os>-<arch> になります）
           cat > release-notes.md << EOF
           ## インストール方法
           
-          お使いのシステムに適したバイナリファイルをダウンロードしてください:
-          - **Linux (x64)**: \`${{ env.BINARY_NAME }}-${VERSION}-linux-amd64\`
-          - **Linux (ARM64)**: \`${{ env.BINARY_NAME }}-${VERSION}-linux-arm64\`
+          各コマンドバイナリは次の形式でリリースアセットに含まれます:
+          \`<cmd>-${VERSION}-linux-amd64\` や \`<cmd>-${VERSION}-linux-arm64\` のようになります。
           
-          ### インストール手順
+          例（<cmd> を実際のコマンド名に置き換えてください）:
+          - **Linux (x64)**: \`<cmd>-${VERSION}-linux-amd64\`
+          - **Linux (ARM64)**: \`<cmd>-${VERSION}-linux-arm64\`
+          
+          ### インストール手順（例）
           \`\`\`bash
-          # ファイルをダウンロード
-          wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/${{ env.BINARY_NAME }}-${VERSION}-linux-amd64
+          # ファイルをダウンロード（<cmd> を実際のコマンド名に置き換える）
+          wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/<cmd>-${VERSION}-linux-amd64
           
           # チェックサムを検証 (推奨)
-          wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/${{ env.BINARY_NAME }}-${VERSION}-linux-amd64.sha256
-          sha256sum -c ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64.sha256
+          wget https://github.com/${{ github.repository }}/releases/download/${VERSION}/<cmd>-${VERSION}-linux-amd64.sha256
+          sha256sum -c <cmd>-${VERSION}-linux-amd64.sha256
           
           # 実行権限を付与
-          chmod +x ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64
+          chmod +x <cmd>-${VERSION}-linux-amd64
           
           # システムパスに移動 (オプション)
-          sudo mv ${{ env.BINARY_NAME }}-${VERSION}-linux-amd64 /usr/local/bin/${{ env.BINARY_NAME }}
+          sudo mv <cmd>-${VERSION}-linux-amd64 /usr/local/bin/<cmd>
           \`\`\`
           EOF
           
