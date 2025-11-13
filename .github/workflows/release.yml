@@ -52,8 +52,7 @@ jobs:
               OUTPUT_NAME="${name}-${{ steps.version.outputs.VERSION }}-${GOOS}-${GOARCH}"
               echo "  - Building ${OUTPUT_NAME} from ${d}..."
               GOOS="${GOOS}" GOARCH="${GOARCH}" CGO_ENABLED=0 \
-                go build -ldflags="-s -w -X 'main.Version=${{ steps.version.outputs.VERSION }}'" \
-                -o "artifacts/${OUTPUT_NAME}" "./${d}"
+                go build -o "artifacts/${OUTPUT_NAME}" "./${d}"
               sha256sum "artifacts/${OUTPUT_NAME}" > "artifacts/${OUTPUT_NAME}.sha256"
             fi
           done
